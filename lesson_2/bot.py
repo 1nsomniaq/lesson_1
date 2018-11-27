@@ -14,8 +14,6 @@ PROXY = {'proxy_url': 'socks5h://t1.learn.python.ru:1080',
 
 API_KEY = "760790871:AAH_R0rdywRkoOx_fz_wbdnyS_2aVhXX7pE"
 
-NOW = datetime.datetime.now()
-
 
 def get_planets_list():
     planets_list = []
@@ -49,6 +47,9 @@ def talk_to_me(bot, update):
 
 
 def get_constellation(bot, update, args):
+    if not args:
+        update.message.reply_text('Нужно было ввести название планеты после команды')
+        return
     try:
         planet = getattr(ephem, args[0])()
     except AttributeError:
