@@ -2,6 +2,7 @@
 
 import logging
 import ephem
+import datetime
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s',
@@ -13,14 +14,24 @@ PROXY = {'proxy_url': 'socks5h://t1.learn.python.ru:1080',
 
 API_KEY = "760790871:AAH_R0rdywRkoOx_fz_wbdnyS_2aVhXX7pE"
 
+NOW = datetime.datetime.now()
+
+
+def get_planets_list():
+    planets_list = []
+    planets_and_moons = ephem._libastro.builtin_planets()
+    for index, planet_type, planet_name in planets_and_moons:
+        if planet_type == 'Planet':
+            planets_list.append(planet_name)
+    return planets_list
+
 
 def main():
     mybot = Updater(API_KEY, request_kwargs=PROXY)
 
     dp = mybot.dispatcher
-    logging.info('before_start')
     dp.add_handler(CommandHandler("start", greet_user))
-    dp.add_handler(CommandHandler("planet", greet_user))
+    dp.add_handler(CommandHandler("planet", get_constellation, pass_args=True))
     dp.add_handler(MessageHandler(Filters.text, talk_to_me))
 
     mybot.start_polling()
@@ -29,16 +40,23 @@ def main():
 
 def greet_user(bot, update):
     text = 'Вызван /start'
-    print text
     update.message.reply_text(text)
 
 
 def talk_to_me(bot, update):
     user_text = update.message.text
-    print user_text
     update.message.reply_text(user_text)
 
-def get_constellation(bot, update):
-    pass
+
+def get_constellation(bot, update, args):
+    try:
+        planet = getattr(ephem, args[0])()
+    except AttributeError:
+        update.message.reply_text('Такой планеты нет:(')
+        return
+    planet.compute(NOW.strftime('%Y/%m/%d'))
+    short_name, long_name = ephem.constellation(planet)
+    update.message.reply_text(long_name)
+
 
 main()
