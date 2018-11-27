@@ -52,9 +52,9 @@ def get_constellation(bot, update, args):
     try:
         planet = getattr(ephem, args[0])()
     except AttributeError:
-        update.message.reply_text('Такой планеты нет:(')
+        update.message.reply_text('Такой планеты нет:( Введите одну из {}'.format(', '.join(get_planets_list())))
         return
-    planet.compute(NOW.strftime('%Y/%m/%d'))
+    planet.compute()
     short_name, long_name = ephem.constellation(planet)
     update.message.reply_text(long_name)
 
