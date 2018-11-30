@@ -51,7 +51,8 @@ def get_constellation(bot, update, args):
         update.message.reply_text('Нужно было ввести название планеты после команды')
         return
     try:
-        planet = getattr(ephem, args[0])()
+        planet_name = args[0].title()
+        planet = getattr(ephem, planet_name)()
     except AttributeError:
         update.message.reply_text('Такой планеты нет:( Введите одну из {}'.format(', '.join(get_planets_list())))
         return
