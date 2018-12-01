@@ -72,7 +72,7 @@ is_male = {
     'Миша': True,
 }
 
-print ' '.join(
+print '\n'.join(
     ['В классе {} {} девочки и {} мальчика.'.format(x[0], Counter(x[1]).get(False, 0), Counter(x[1]).get(True, 0)) for x
      in [(school_class['class'], [is_male[student['first_name']] for student in school_class['students']]) for
          school_class in school]])
@@ -94,8 +94,13 @@ is_male = {
     'Олег': True,
     'Миша': True,
 }
-# ???
 
 # Пример вывода:
 # Больше всего мальчиков в классе 3c
 # Больше всего девочек в классе 2a
+
+print '\n'.join(
+    ['Больше всего {} в классе {}'.format('мальчиков' if freQ_ is True else 'девочек', school_class) for
+     school_class, freQ_ in
+     [(school_class['class'], max([is_male[student['first_name']] for student in school_class['students']]))
+      for school_class in school]])
