@@ -100,7 +100,7 @@ is_male = {
 # Больше всего девочек в классе 2a
 
 print '\n'.join(
-    ['Больше всего {} в классе {}'.format('мальчиков' if freQ_ is True else 'девочек', school_class) for
-     school_class, freQ_ in
+    ['Больше всего {} в классе {}'.format('мальчиков' if common_gender is True else 'девочек', school_class) for
+     school_class, common_gender in
      [(school_class['class'], max([is_male[student['first_name']] for student in school_class['students']]))
       for school_class in school]])
