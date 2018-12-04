@@ -9,6 +9,9 @@ from collections import defaultdict
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from cities import CITIES
+from arithmetical_expression import ArithmeticalExpression, WrongArithmeticalExpression, NonBalancedParenthesis
+
+OPERATIONS = '-+/*'
 
 
 class WrongCityException(Exception):
@@ -45,6 +48,7 @@ def main():
     dp.add_handler(CommandHandler("wordcount", get_word_count, pass_args=True))
     dp.add_handler(CommandHandler("next_full_moon", get_next_full_moon, pass_args=True))
     dp.add_handler(CommandHandler("cities", get_city_for_game, pass_args=True))
+    dp.add_handler(CommandHandler("calc", calculate_from_string, pass_args=True))
 
     dp.add_handler(MessageHandler(Filters.text, talk_to_me))
 
@@ -129,6 +133,23 @@ def get_city_for_game(bot, update, args):
     else:
         update.message.reply_text('Я сдаюсь!')
         USED_CITIES[chat_id] = []
+
+
+def calculate_from_string(bot, update, args):
+    if not args:
+        update.message.reply_text('Надо было ввести арифметическое выражение')
+        return
+    user_string = ''.join(args)
+    ar_exp = ArithmeticalExpression(user_string)
+    try:
+        ar_exp.check_syntax()
+        ar_exp.check_parenthesis()
+    except (WrongArithmeticalExpression, NonBalancedParenthesis) as exc:
+        update.message.reply_text(exc.message)
+        return
+    ArithmeticalExpression.transform_to_postfix(ar_exp)
+    result = ar_exp.calculate()
+    update.message.reply_text(result)
 
 
 main()
