@@ -144,12 +144,12 @@ def calculate_from_string(bot, update, args):
     try:
         ar_exp.check_syntax()
         ar_exp.check_parenthesis()
+        ArithmeticalExpression.transform_to_postfix(ar_exp)
+        result = ar_exp.calculate()
+        update.message.reply_text(result)
     except (WrongArithmeticalExpression, NonBalancedParenthesis) as exc:
         update.message.reply_text(exc.message)
         return
-    ArithmeticalExpression.transform_to_postfix(ar_exp)
-    result = ar_exp.calculate()
-    update.message.reply_text(result)
 
 
 main()

@@ -103,7 +103,10 @@ class ArithmeticalExpression(object):
             if token == '*':
                 return operand1.__mul__(operand2)
             if token == '/':
-                return operand1.__truediv__(operand2)
+                try:
+                    return operand1.__truediv__(operand2)
+                except ZeroDivisionError as exc:
+                    raise WrongArithmeticalExpression('Делить на ноль нельзя')
 
         op_stack = []
         for op in self.postfix_operator_list:
@@ -135,11 +138,14 @@ class ArithmeticalExpression(object):
         return [Operator(op_value) for op_value in result]
 
     def check_syntax(self):
+        operator_count = 0
         if len(self.operator_list) < 3:
             raise WrongArithmeticalExpression('Должно быть минимум три оператора')
 
         previous_op = self.operator_list[0]
         for op in self.operator_list[1:]:
+            if previous_op.is_operator:
+                operator_count += 1
             previous_op.is_valid_pair_with(op)
             previous_op = op
 
@@ -147,12 +153,15 @@ class ArithmeticalExpression(object):
         if not (last_op.is_closing_parenthesis or last_op.is_numeric):
             raise WrongArithmeticalExpression('Последним оператором должны быть закрывающие скобки или число')
 
+        if operator_count == 0:
+            raise WrongArithmeticalExpression('В выражении должен быть хотя бы один оператор')
+
     def check_parenthesis(self):
         paren_stack = []
         for op in [op for op in self.operator_list if op.is_parenthesis]:
             if op.is_opening_parenthesis:
                 paren_stack.append(op)
-            if op.is_closing_parenthesis and paren_stack:
+            elif op.is_closing_parenthesis and paren_stack:
                 paren_stack.pop()
             else:
                 raise NonBalancedParenthesis('Лишняя закрывающая скобка')
